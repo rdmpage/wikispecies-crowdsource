@@ -21,6 +21,53 @@
 	</style>
 	
 	<script>
+	
+	// https://osric.com/chris/accidental-developer/2012/11/balancing-tags-in-html-and-xhtml-excerpts/
+	
+// balance:
+// - takes an excerpted or truncated XHTML string
+// - returns a well-balanced XHTML string
+function balance(string) {
+  // Check for broken tags, e.g. <stro
+  // Check for a < after the last >, indicating a broken tag
+  if (string.lastIndexOf("<") > string.lastIndexOf(">")) {
+    // Truncate broken tag
+    string = string.substring(0,string.lastIndexOf("<"));
+  }
+
+  // Check for broken elements, e.g. &lt;strong&gt;Hello, w
+  // Get an array of all tags (start, end, and self-closing)
+  var tags = string.match(/<[^>]+>/g);
+  var stack = new Array();
+  for (tag in tags) {
+    if (tags[tag].search("/") <= 0) {
+      // start tag -- push onto the stack
+      stack.push(tags[tag]);
+    } else if (tags[tag].search("/") == 1) {
+      // end tag -- pop off of the stack
+      stack.pop();
+    } else {
+      // self-closing tag -- do nothing
+    }
+  }
+
+  // stack should now contain only the start tags of the broken elements,
+  // the most deeply-nested start tag at the top
+  while (stack.length > 0) {
+    // pop the unmatched tag off the stack
+    var endTag = stack.pop();
+    // get just the tag name
+    endTag = endTag.substring(1,endTag.search(/[ >]/));
+    // append the end tag
+    string += "</" + endTag + ">";
+  }
+
+  // Return the well-balanced XHTML string
+  return(string);
+}	
+	</script>
+	
+	<script>
 	function do_text_search(text) {
 	
 	$('#content').html('');
@@ -151,7 +198,7 @@
 								html += '<div style="padding:10px;' + style + '">';
 								html += '<span style="font-size:1.5em;line-height:1em;">' 
 									//+ '[' + clusters[i][j].length + '] '
-									+ clusters[i][j].name 
+									+ balance(clusters[i][j].name)
 									+ '</span><br />';
 								html += '<span style="color:green;">' + clusters[i][j].description + '</span><br />';
 						

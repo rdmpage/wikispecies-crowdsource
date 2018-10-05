@@ -6,7 +6,7 @@ require_once (dirname(__FILE__) . '/config.inc.php');
 require_once (dirname(__FILE__) . '/couchsimple.php');
 require_once (dirname(__FILE__) . '/elastic_utils.php');
 
-$limit = 10;
+$limit = 2;
 
 $url = '_changes?limit=' . $limit . '&descending=true';
 
@@ -16,7 +16,7 @@ $resp = $couch->send("GET", "/" . $config['couchdb_options']['database'] . "/" .
 
 $obj = json_decode($resp);
 
-//print_r($obj);
+print_r($obj);
 
 foreach ($obj->results as $result)
 {
@@ -33,14 +33,23 @@ foreach ($obj->results as $result)
 		
 		if (isset($doc->references))
 		{
-			// upload references
-			foreach ($doc->references as $k => $work)
+			// If Template then id is page id, otherwise it's index in array of references
+			if (isset($doc->references))
 			{
-				doc_to_elastic($doc->_id . '#' . ($k + 1));
+				if (preg_match('/^Template:/', $doc->_id))
+				{
+					doc_to_elastic($doc->_id);
+				}
+				else
+				{
+					// upload references
+					foreach ($doc->references as $k => $work)
+					{
+						doc_to_elastic($doc->_id . '#' . ($k + 1));
+					}
+				}
 			}
 		}
-		
-		
 	}
 	
 }

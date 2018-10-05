@@ -28,8 +28,6 @@ class ElasticSearch
 			$url .= '/' . $action_url;
 		}
 		
-		//echo $url . "\n";
-		
 		curl_setopt ($ch, CURLOPT_URL, $url); 
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
 		
@@ -73,7 +71,7 @@ class ElasticSearch
    		$response = curl_exec($ch);
     	$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     	
-    	//echo $response;
+    	echo $response;
     	
 		if (curl_errno ($ch) != 0 )
 		{

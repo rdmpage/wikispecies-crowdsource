@@ -3,16 +3,30 @@
 <plist version="1.0">
 <dict>
 	<key>baseURL</key>
-	<string>http://35.204.73.93:80/elasticsearch/biostor/_search?pretty</string>
+	<string>http://35.204.73.93:80/elasticsearch/wikispecies/_search?pretty</string>
 	<key>bodyString</key>
 	<string>{
 "size":20,
     "query": {
        "multi_match" : {
-      "query": "Raxworthy",
+      "query": "Underwoodisaurus",
       "fields":["search_data.fulltext", "search_data.fulltext_boosted^4"] 
     }
 },
+
+"highlight": {
+      "pre_tags": [
+         "&lt;span style=\"background-color:yellow;\"&gt;"
+      ],
+      "post_tags": [
+         "&lt;\/span&gt;"
+      ],
+      "fields": {
+         "search_data.fulltext": {},
+         "search_data.fulltext_boosted": {}
+      }
+   },
+
 
 "aggs": {
 "type" :{

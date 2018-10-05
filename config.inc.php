@@ -28,5 +28,16 @@ $config['elastic_options'] = array(
 		'password' => '7WbQZedlAvzQ'
 		);
 
+// CouchDB--------------------------------------------------------------------------------
+
+// local
+$config['couchdb_options'] = array(
+		'database' => 'oz-wikispecies',
+		'host' => 'localhost',
+		'port' => 5984,
+		'prefix' => 'http://'
+		);		
+
+$config['stale'] = true;
 	
 ?>

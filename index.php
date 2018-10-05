@@ -38,7 +38,47 @@
 			"filter": []
 				}
 			},
+			
+
+"highlight": {
+      "pre_tags": [
+         "<span style=\"background-color:yellow;\">"
+      ],
+      "post_tags": [
+         "<\/span>"
+      ],
+      "fields": {
+         "search_data.fulltext": {},
+         "search_data.fulltext_boosted": {}
+      }
+   },			
+			
 			"aggs": {
+			
+	
+	"by_cluster_id": {
+		"terms": {
+			"field": "search_data.cluster_id.keyword",
+			"order": {
+				"max_score.value": "desc"
+			}
+		},
+	
+	
+		"aggs": {
+			"max_score": {
+				"max": {
+					"script": {
+						"lang": "painless",
+						"inline": "_score"
+					}
+				}
+			}
+		}
+	},
+			
+			
+			
 			"type" :{
 				"terms": { "field" : "search_data.type.keyword" }
 			  },
@@ -51,9 +91,6 @@
 			  "author" :{
 				"terms": { "field" : "search_data.author.keyword" }
 			  },
-			  "classification" :{
-				"terms": { "field" : "search_data.classification.keyword" }
-			  }  
 
 			}
 
@@ -70,24 +107,103 @@
 				+ '&postdata=' + JSON.stringify(q)
 				+ '&callback=?',
 			function(data){        
+			
+			
 				// do stuff here...
 				if (data.hits) {
 					if (data.hits.total > 0) {
-						var html = '';
+					
+						// Cluster by cluster_id
+						/*
+						var c = {};
 						for (var i in data.hits.hits) {
-							html += '<div style="padding:10px;">';
-							html += '<span style="font-size:1.5em;line-height:1em;">' + data.hits.hits[i]._source.search_result_data.name + '</span><br />';
-							html += '<span style="color:green;">' + data.hits.hits[i]._source.search_result_data.description + '</span><br />';
-							html += '<a href="' + data.hits.hits[i]._source.search_result_data.url + '" target="_new">' + data.hits.hits[i]._source.search_result_data.url + '</a>' + '<br />';
+							var cluster_id = data.hits.hits[i]._source.search_data.cluster_id;
+							if (!c[cluster_id]) {
+								c[cluster_id] = [];
+							}
+							c[cluster_id].push
+						
+						}
+						*/
+						
+						var clusters = {};
+						for (var i in data.aggregations.by_cluster_id.buckets) {
+							clusters[data.aggregations.by_cluster_id.buckets[i].key] = [];
+						}
+
+						for (var i in data.hits.hits) {
+							var cluster_id = data.hits.hits[i]._source.search_data.cluster_id;
+							console.log(cluster_id);
+							clusters[cluster_id].push(data.hits.hits[i]._source.search_result_data);						
+						}
+						
+						var html = '';
+						for (var i in clusters) {
+							//html += clusters[i][0].name + '<br />';
 							
-							if (data.hits.hits[i]._source.search_result_data.doi) {
-								html += '<a href="https://doi.org/' + data.hits.hits[i]._source.search_result_data.doi + '" target="_new">' + 'DOI:' + data.hits.hits[i]._source.search_result_data.doi + '</a>' + '<br />';							
+							var style = '';
+							if (clusters[i].length > 1) {
+								style += 'border-left:2px solid orange;background-color:yellow;';
 							}
 							
-							html += '</div>';
+							for (var j in clusters[i]) {
+								html += '<div style="padding:10px;' + style + '">';
+								html += '<span style="font-size:1.5em;line-height:1em;">' 
+									//+ '[' + clusters[i][j].length + '] '
+									+ clusters[i][j].name 
+									+ '</span><br />';
+								html += '<span style="color:green;">' + clusters[i][j].description + '</span><br />';
+						
+								/*
+								if (data.hits.hits[i].highlight["search_data.fulltext"]) {
+									for (var j in data.hits.hits[i].highlight["search_data.fulltext"]) {
+										html += '<div>' + data.hits.hits[i].highlight["search_data.fulltext"][j] + '</div>';
+									}
+								}
+								*/
+						
+						
+								html += '<a href="' + clusters[i][j].url + '" target="_new">' + clusters[i][j].url + '</a>' + '<br />';
+						
+								if (clusters[i][j].doi) {
+									html += '<a href="https://doi.org/' + clusters[i][j].doi + '" target="_new">' + 'DOI:' + clusters[i][j].doi + '</a>' + '<br />';							
+								}
+						
+								html += '</div>';
+							}
+							
+						
 						}
-				
 						$('#content').html(html);
+						
+					
+						// List raw hits
+						if (0)
+						{
+							var html = '';
+							for (var i in data.hits.hits) {
+								html += '<div style="padding:10px;">';
+								html += '<span style="font-size:1.5em;line-height:1em;">' + data.hits.hits[i]._source.search_result_data.name + '</span><br />';
+								html += '<span style="color:green;">' + data.hits.hits[i]._source.search_result_data.description + '</span><br />';
+							
+								if (data.hits.hits[i].highlight["search_data.fulltext"]) {
+									for (var j in data.hits.hits[i].highlight["search_data.fulltext"]) {
+										html += '<div>' + data.hits.hits[i].highlight["search_data.fulltext"][j] + '</div>';
+									}
+								}
+							
+							
+								html += '<a href="' + data.hits.hits[i]._source.search_result_data.url + '" target="_new">' + data.hits.hits[i]._source.search_result_data.url + '</a>' + '<br />';
+							
+								if (data.hits.hits[i]._source.search_result_data.doi) {
+									html += '<a href="https://doi.org/' + data.hits.hits[i]._source.search_result_data.doi + '" target="_new">' + 'DOI:' + data.hits.hits[i]._source.search_result_data.doi + '</a>' + '<br />';							
+								}
+							
+								html += '</div>';
+							}
+				
+							$('#content').html(html);
+						}
 					}
 				}
         
@@ -136,7 +252,7 @@
           
           <div>
             <h4>
-              Facet
+              Sidebar
             </h4>
             <div id="facet"></div>
           </div>

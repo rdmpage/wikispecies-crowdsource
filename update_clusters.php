@@ -131,4 +131,13 @@ function update($clusters)
 $to_do = array('Cavognathidae#2', 'Boganiidae#6');
 
 $doi = '10.1080/00222936900770481';
-cluster_by_doi_wikispecies($doi);
+
+$dois = array(
+'10.1111/j.1440-6055.2008.00647.x',
+'10.3853/j.0067-1975.62.2010.1556'
+);
+
+foreach ($dois as $doi)
+{
+	cluster_by_doi_wikispecies($doi);
+}

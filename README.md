@@ -8,6 +8,9 @@ Wikispecies as a crowdsourced bibliographic database
 curl http://127.0.0.1:5984/oz-wikispecies/_design/export/_list/jsonl/elastic > elastic.jsonl
 ``` 
 
+## Clustering in search
+
+Make sure we set a value for "size" for the cluster agg.
 
 ## Examples
 

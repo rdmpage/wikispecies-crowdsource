@@ -59,6 +59,7 @@
 	"by_cluster_id": {
 		"terms": {
 			"field": "search_data.cluster_id.keyword",
+			"size": 50,
 			"order": {
 				"max_score.value": "desc"
 			}

@@ -10,7 +10,19 @@ curl http://127.0.0.1:5984/oz-wikispecies/_design/export/_list/jsonl/elastic > e
 
 ## Clustering in search
 
-Make sure we set a value for "size" for the cluster agg.
+Clustering search results by cluster_id to group together multiple copies of the same reference. By default aggregations return only 10 results, so if we return more than 10 results we may have cluster_ids in the hits that aren’t in the eggs. Make sure the value for "size" for the cluster agg is the same as the number of search results requested.
+
+## Link testing
+
+```
+curl http://127.0.0.1:5984/oz-wikispecies/_design/link/_list/key/pdf > pdfs.txt
+```
+
+Test each link to get HTTP code.
+
+## Authors
+
+List all authors with WIKISPECIES page (could use to map to Wikidata items)
 
 ## Examples
 

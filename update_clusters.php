@@ -3,6 +3,34 @@
 require_once(dirname(__FILE__) . '/couchsimple.php');
 require_once(dirname(__FILE__) . '/merge_records.php');
 
+//----------------------------------------------------------------------------------------
+// Get hash for document $id
+function doc_to_hash($id)
+{
+	global $config;
+	global $couch;
+	
+	$hash = array();
+
+	$url = '_design/matching/_view/doc_to_hash' . '?key=' . urlencode('"' . $id . '"');
+	
+	$resp = $couch->send("GET", "/" . $config['couchdb_options']['database'] . "/" . $url);
+
+	if ($resp)
+	{
+		$response_obj = json_decode($resp);
+		
+		if (!isset($response_obj->error))
+		{
+			if (count($response_obj->rows) == 1) {
+				$hash = $response_obj->rows[0]->value;
+			}		
+		}
+	}
+	
+	return $hash;
+}
+
 
 //----------------------------------------------------------------------------------------
 // Get DOI for document $id
@@ -78,7 +106,56 @@ function cluster_by_doi_wikispecies($doi)
 		update($clusters);
 		
 	}	
+}
 
+//----------------------------------------------------------------------------------------
+// Wikispecies-specific clustering where we may have > 1 reference per document
+function cluster_by_hash_wikispecies($hash) 
+{
+	global $config;
+	global $couch;
+	
+	// list of works that have been clustered
+	//$works_clustered = [];
+	
+	//print_r($hash);
+	
+	$url = '_design/matching/_view/hash?key=' . urlencode(json_encode($hash));
+	
+	$resp = $couch->send("GET", "/" . $config['couchdb_options']['database'] . "/" . $url);
+	
+	$response_obj = json_decode($resp);
+	
+	$records = array();
+
+	foreach ($response_obj->rows as $row)
+	{
+		// Wikispecies-specific
+		$one_record = new stdclass;
+		$one_record->id = $row->id;
+		$one_record->key = $row->key;
+		$one_record->value = $row->value;
+		
+		$records[] = $one_record;
+	}
+	
+	// Do we have more than one work with this hash?
+	if (count($records) > 1)
+	{
+		// Records that could be clustered		
+		echo "Works with this hash:\n";
+		print_r($records);
+		
+		// Find clusters for these records
+		$clusters = merge_records($records, true);
+		
+		echo "Clusters:\n";
+		print_r($clusters);
+		
+		// merge documents...
+		update($clusters);
+		
+	}	
 }
 
 //----------------------------------------------------------------------------------------
@@ -128,8 +205,9 @@ function update($clusters)
 
 // list of documents to check or cluster
 
-$to_do = array('Cavognathidae#2', 'Boganiidae#6');
+//$to_do = array('Cavognathidae#2', 'Boganiidae#6');
 
+/*
 $doi = '10.1080/00222936900770481';
 
 $dois = array(
@@ -141,3 +219,14 @@ foreach ($dois as $doi)
 {
 	cluster_by_doi_wikispecies($doi);
 }
+*/
+
+
+$hash = array(1959, 86, 269);
+
+cluster_by_hash_wikispecies($hash);
+
+
+
+
+

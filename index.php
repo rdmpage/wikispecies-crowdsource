@@ -13,6 +13,8 @@
 
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>  
+	
+	<link rel="stylesheet" href="academicons-1.8.6/css/academicons.min.css"/>
   
 	<style type="text/css">	
 	body { 
@@ -68,9 +70,159 @@ function balance(string) {
 	</script>
 	
 	<script>
+	
+       //--------------------------------------------------------------------------------
+		function doi_in_wikidata(doi, element_id) {
+			var sparql = `SELECT *
+WHERE
+{
+  ?work wdt:P356 "DOI" .
+}`;
+
+			sparql = sparql.replace(/DOI/, doi.toUpperCase());
+	
+			$.getJSON('https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + encodeURIComponent(sparql),
+				function(data){
+				  if (data.results.bindings.length == 1) {
+            		html = 'DOI in Wikidata <a class="external" href="' + data.results.bindings[0].work.value + '" target="_new">' + data.results.bindings[0].work.value.replace("http://www.wikidata.org/entity/","") + '</a>';
+				  } else {
+				     html = 'DOI not in Wikidata';         
+				  }
+				  document.getElementById(element_id).innerHTML = html;
+			});			
+
+		}	
+		
+		
+		
+		// ISSN in Wikidata?
+		
+		
+		// People in Wikidata?
+       //--------------------------------------------------------------------------------
+		function author_in_wikidata(wikispecies, element_id) {
+
+			document.getElementById(element_id).innerHTML = '';
+			
+			$.getJSON('wikidata-author.php?name=' + encodeURIComponent(wikispecies) + '&callback=?',
+				function(data){
+				  if (data.hits.length == 1) {
+				    var html = '';
+				    html += decodeURIComponent(data.query) + '<br />';
+				    html += '<ul style="list-style-type:none">';
+				    for (var j in data.hits[0]) {
+				    	switch (j) {
+	
+				    		case 'google':
+				    			html += '<li>' + '<i class="ai ai-google-scholar"></i>' + ' ' + '<a href="https://scholar.google.com/citations?user=' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
+				    			break;				    					    	
+				    	
+				    		case 'orcid':
+				    			html += '<li>' + '<i class="ai ai-orcid"></i>'  + ' ' + '<a href="https://orcid.org/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
+				    			break;				    					    	
+				    	
+				    		case 'researchgate':
+				    			html += '<li>' + '<i class="ai ai-researchgate"></i>'  + ' ' + '<a href="https://www.researchgate.net/profile/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
+				    			break;				    	
+				    	
+				    		case 'wikidata':
+				    			html += '<li>' + '<img src="images/wikidata.png" height="16" />' + ' ' + '<a href="https://www.wikidata.org/wiki/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
+				    			break;				    	
+				    	
+				    		case 'zoobank':
+				    			html += '<li>' + 'ZB' + ' ' + '<a href="http://zoobank.org/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
+				    			break;
+				    			
+				    		default:
+				    			break;
+				    	
+				    	}
+				    }
+				    html += '</ul>';
+					document.getElementById(element_id).innerHTML = document.getElementById(element_id).innerHTML + html;
+				  }				  
+			});			
+		}			
+		
+		
+		
+		// Other identifier in Wikidata e.g. ISBN?
+		
+		
+		// OpenURL-style query in Wikidata?
+		
+		
+		
+			
+       //--------------------------------------------------------------------------------
+	
+	function show_record(id) {
+		$('#record').html(id);
+		$('#wikidata-doi').html('');
+		$('#wikidata-author').html('');
+		
+		if (id.match(/%23/)) {
+		} else {
+			id = encodeURI(id);
+		}
+		
+		$.getJSON('proxy.php?url=' 
+				+ encodeURI('http://user:7WbQZedlAvzQ@35.204.73.93/elasticsearch/wikispecies/_doc/' + id)
+				+ '&callback=?',
+			function(data){ 
+				if (data._source) {
+					var html = '';
+					html += '<span style="font-size:1.5em;line-height:1em;">' + data._source.search_result_data.name + '</span>' + '<br />';
+					html += data._source.search_result_data.description + '<br />';
+					
+					html += data._source.search_result_data.creator.join(' ') + '<br />';
+
+					/*
+					if (data._source.search_result_data.WIKISPECIES) {
+						html += data._source.search_result_data.WIKISPECIES.join(' | ') + '<br />';
+					}
+					*/
+					
+					if (data._source.search_result_data.doi) {
+						html += '<i class="ai ai-doi"></i>' + data._source.search_result_data.doi + '<br />';
+					}
+
+					if (data._source.search_result_data.pdf) {
+						html += '<a href="' + data._source.search_result_data.pdf + '" target="_new">PDF</a><br />';
+					}
+					
+					// Wikidata searches
+					if (data._source.search_result_data.doi) {
+						doi_in_wikidata(data._source.search_result_data.doi, 'wikidata-doi');
+					}
+					
+					if (data._source.search_result_data.WIKISPECIES) {
+						for (var j in data._source.search_result_data.WIKISPECIES) {
+							author_in_wikidata(data._source.search_result_data.WIKISPECIES[j], 'wikidata-author');
+						}
+						
+					}
+
+					
+					
+					$('#record').html(html);
+				
+				}
+			
+			});       
+		
+		
+		
+	}
+	
+	
+	
 	function do_text_search(text) {
 	
 	$('#content').html('');
+	$('#record').html('');
+	$('#wikidata-doi').html('');
+	$('#wikidata-author').html('');
 	
 	var q = {
 			"size":50,
@@ -89,7 +241,7 @@ function balance(string) {
 
 "highlight": {
       "pre_tags": [
-         "<span style=\"background-color:yellow;\">"
+         "<span style=\"background-color:yellow;\">" 
       ],
       "post_tags": [
          "<\/span>"
@@ -191,12 +343,19 @@ function balance(string) {
 							
 							var style = '';
 							if (clusters[i].length > 1) {
-								style += 'border-left:2px solid orange;background-color:yellow;';
+								style += 'border-left:2px solid orange;background-color:#FFFFCC;';
 							}
 							
 							for (var j in clusters[i]) {
 								html += '<div style="padding:10px;' + style + '">';
-								html += '<span style="font-size:1.5em;line-height:1em;">' 
+								html += '<span style="font-size:1.5em;line-height:1em;"' 
+								
+									// this really should be record id not cluster id, but we don't have a way to
+									// access this the way I've set up search_data
+								
+									+ ' onclick="show_record(\'' + i.replace('#', '%23') + '\')"'									
+									+ '>'
+									
 									//+ '[' + clusters[i][j].length + '] '
 									+ balance(clusters[i][j].name)
 									+ '</span><br />';
@@ -215,6 +374,10 @@ function balance(string) {
 						
 								if (clusters[i][j].doi) {
 									html += '<a href="https://doi.org/' + clusters[i][j].doi + '" target="_new">' + 'DOI:' + clusters[i][j].doi + '</a>' + '<br />';							
+								}
+
+								if (clusters[i][j].pdf) {
+									html += '<a style="color:white;background-color:red;" href="' + clusters[i][j].pdf + '" target="_new">' + clusters[i][j].pdf + '</a>' + '<br />';							
 								}
 						
 								html += '</div>';
@@ -291,18 +454,16 @@ function balance(string) {
    <div class="container">
 
 	  <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-8" style="border-right:1px solid rgb(224,224,224);">
         <div style="padding:10px;" class="row" id="content">
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="row" id="facet">           
-          
-          <div>
-            <h4>
-              Sidebar
-            </h4>
-            <div id="facet"></div>
+      <div class="col-md-3">
+        <div class="row affix" id="facet">         
+          <div style="padding:10px;">
+            <div id="record"></div>
+            <div id="wikidata-doi"></div>
+             <div id="wikidata-author"></div>
           </div>
           
          

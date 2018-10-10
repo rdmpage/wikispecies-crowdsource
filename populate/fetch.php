@@ -100,6 +100,10 @@ $page_names = array(
 'Cangoderces'
 );
 
+$page_names = array(
+'Shu-Qiang_Li'
+);
+
 // Read list of page names
 if (0)
 {

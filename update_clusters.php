@@ -205,26 +205,34 @@ function update($clusters)
 
 // list of documents to check or cluster
 
-//$to_do = array('Cavognathidae#2', 'Boganiidae#6');
 
-/*
-$doi = '10.1080/00222936900770481';
-
-$dois = array(
-'10.1111/j.1440-6055.2008.00647.x',
-'10.3853/j.0067-1975.62.2010.1556'
-);
-
-foreach ($dois as $doi)
+if (1)
 {
-	cluster_by_doi_wikispecies($doi);
+	$doi = '10.1080/00222936900770481';
+
+	$dois = array(
+	'10.1111/j.1440-6055.2008.00647.x',
+	'10.3853/j.0067-1975.62.2010.1556'
+	);
+	
+	$dois = array(
+	'10.1080/01647959608684104'
+	);
+	
+
+	foreach ($dois as $doi)
+	{
+		cluster_by_doi_wikispecies($doi);
+	}
 }
-*/
 
+if (0)
+{
 
-$hash = array(1959, 86, 269);
+	$hash = array(1959, 86, 269);
 
-cluster_by_hash_wikispecies($hash);
+	cluster_by_hash_wikispecies($hash);
+}
 
 
 

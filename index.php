@@ -334,6 +334,10 @@ WHERE
 						for (var i in data.hits.hits) {
 							var cluster_id = data.hits.hits[i]._source.search_data.cluster_id;
 							console.log(cluster_id);
+							// check we have this cluster_id, we should, but sometimes we don't :(
+							if (!clusters[cluster_id]) {
+								clusters[cluster_id] = [];
+							}
 							clusters[cluster_id].push(data.hits.hits[i]._source.search_result_data);						
 						}
 						

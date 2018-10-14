@@ -32,7 +32,8 @@ if (1)
 {
 		// local
 		$config['couchdb_options'] = array(
-				'database' => 'oz-wikispecies',
+				//'database' => 'oz-wikispecies',
+				'database' => 'wikispecies-crowdsource',
 				'host' => 'localhost',
 				'port' => 5984,
 				'prefix' => 'http://'

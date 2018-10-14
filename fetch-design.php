@@ -26,7 +26,7 @@ function get($url)
 }
 
 $views = array(
-	'oz-wikispecies' => array('author', 'cleaning', 'count', 'export', 'identifier', 'link', 'matching')
+	'oz-wikispecies' => array('author', 'cleaning', 'count', 'export', 'identifier', 'link', 'matching', 'metadata')
 );
 
 

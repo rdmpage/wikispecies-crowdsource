@@ -5,7 +5,7 @@ Wikispecies as a crowdsourced bibliographic database
 ## Bulk upload
 
 ```
-curl http://127.0.0.1:5984/oz-wikispecies/_design/export/_list/jsonl/elastic > elastic.jsonl
+curl http://127.0.0.1:5984/wikispecies-crowdsource/_design/export/_list/jsonl/elastic > elastic.jsonl
 ``` 
 
 ## Clustering in search

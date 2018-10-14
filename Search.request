@@ -9,7 +9,7 @@
 "size":20,
     "query": {
        "multi_match" : {
-      "query": "Underwoodisaurus",
+      "query": "species",
       "fields":["search_data.fulltext", "search_data.fulltext_boosted^4"] 
     }
 },
@@ -29,6 +29,29 @@
 
 
 "aggs": {
+
+
+"by_cluster_id": {
+		"terms": {
+			"field": "search_data.cluster_id.keyword",
+			"order": {
+				"max_score.value": "desc"
+			}
+		},
+	
+	
+		"aggs": {
+			"max_score": {
+				"max": {
+					"script": {
+						"lang": "painless",
+						"inline": "_score"
+					}
+				}
+			}
+		}
+	},
+
 "type" :{
     "terms": { "field" : "search_data.type.keyword" }
   },
@@ -40,10 +63,7 @@
   },
   "author" :{
     "terms": { "field" : "search_data.author.keyword" }
-  },
-  "classification" :{
-    "terms": { "field" : "search_data.classification.keyword" }
-  }  
+  }
 
 }
 

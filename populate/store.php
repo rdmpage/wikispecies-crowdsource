@@ -43,7 +43,7 @@ function process_references ($obj, $force = false)
 		}
 	}	
 		
-	print_r($obj);
+	//print_r($obj);
 
 		
 	if (1)

@@ -1,5 +1,11 @@
-vendor/
-elastic-6026.json
+
+
 elastic.jsonl
-elastic-1137.json
-elastic-6084.json
+elastic-*.json
+
+populate/dump/*.bz2
+populate/dump/*.xml
+
+
+vendor/
+summary/c.json

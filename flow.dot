@@ -1,0 +1,27 @@
+digraph g {
+	dump[label="Wikispecies dump"];
+	
+	couchdb[label="CouchDB document store"];
+	elastic[label="Elasticsearch"];
+	page[label="Wikispecies page in XML"];
+	csl[label="References on page in CSL JSON format"];
+	
+	dump -> page [label="page extractor"];
+	page -> csl [label="extract references"];
+	csl -> couchdb [label="store CSL JSON"];
+	
+	couchdb -> elastic[label="couchdb view"];
+	couchdb -> "wikispecies author name" [label="couchdb view"];
+	
+	"wikispecies author name" -> "wikispecies URL" [label="resolve redirects"];
+	"wikispecies URL" -> "wikidata item for author" [label="sparql query"];
+	
+	"elastic search documents" -> elastic;
+	
+	 "wikidata item for author" -> "web site";
+	
+	elastic -> "web site";
+
+
+
+}

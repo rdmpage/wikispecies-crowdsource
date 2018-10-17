@@ -59,10 +59,15 @@ function merge_records ($records, $check = false)
 		{
 			makeset($i);
 		}
+		
+		$pairwise = ($n < 10);
 
-		for ($i = 1; $i < $n; $i++)
+		if (!$pairwise)
 		{
-			for ($j = 0; $j < $i; $j++)
+			// compare just with first one, to avoid explosion
+			$i = 0;
+			
+			for ($j = 1; $j < $n; $j++)
 			{
 				// use string matching to check match
 				if ($check)
@@ -70,34 +75,87 @@ function merge_records ($records, $check = false)
 					// Wikispecies-specific
 					$v1 = $records[$i]->value[1];
 					$v2 = $records[$j]->value[1];
-			
+					
+					// trim so we don't get an out of memory error on long strings
+					$v1 = substr($v1, 0, 100);
+					$v2 = substr($v2, 0, 100);
+		
 					$v1 = finger_print($v1);
 					$v2 = finger_print($v2);
-					
+				
 					if (0)
 					{
 						echo $v1 . "\n";
 						echo $v2 . "\n";
 					}
-			
+		
 					$lcs = new LongestCommonSequence($v1, $v2);
 					$d = $lcs->score();
-			
+		
 					$score = min($d / strlen($v1), $d / strlen($v2));
-			
+		
 					if ($score > 0.80)
 					{
-						union($i, $j);
+						union($j, $i);
 					}					
 				}
 				else
 				{
 					// Just merge (e.g., if set of records is based on sharing an identifier)
-					union($i, $j);
+					union($j, $i);
+				}
+			}		
+		}
+		else
+		{
+			// Pairwise comparison, explodes if n is too large
+			for ($i = 1; $i < $n; $i++)
+			{
+				for ($j = 0; $j < $i; $j++)
+				{
+					// use string matching to check match
+					if ($check)
+					{					
+						// Wikispecies-specific
+						$v1 = $records[$i]->value[1];
+						$v2 = $records[$j]->value[1];
+			
+						$v1 = finger_print($v1);
+						$v2 = finger_print($v2);
+					
+						if (0)
+						{
+							echo $v1 . "\n";
+							echo $v2 . "\n";
+						}
+			
+						$lcs = new LongestCommonSequence($v1, $v2);
+						$d = $lcs->score();
+			
+						$score = min($d / strlen($v1), $d / strlen($v2));
+			
+						if ($score > 0.80)
+						{
+							union($i, $j);
+						}					
+					}
+					else
+					{
+						// Just merge (e.g., if set of records is based on sharing an identifier)
+						union($i, $j);
+					}
 				}
 			}
 		}
-	
+		
+		if (0)
+		{
+			for ($i = 0; $i < $n; $i++)
+			{
+				echo $i . '->' . $parents[$i] . "\n";
+			}		
+		}		
+			
 		// Get list of components of graph, which are the sets rooted on each parent node
 		$blocks = array();
 	

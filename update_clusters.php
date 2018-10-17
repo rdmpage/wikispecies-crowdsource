@@ -206,7 +206,7 @@ function update($clusters)
 // list of documents to check or cluster
 
 
-if (1)
+if (0)
 {
 	$doi = '10.1080/00222936900770481';
 
@@ -228,10 +228,42 @@ if (1)
 
 if (0)
 {
+	$hashes = array(
+		array(1994, 58, 123),
+		array(1966, 12, 307),
+		array(1965, 9, 21),
+	);
 
-	$hash = array(1959, 86, 269);
+	$hashes = array(
+		array(1871, 43, 111) // 550 members
+	);
+		
+	foreach ($hashes as $hash) 
+	{
+		cluster_by_hash_wikispecies($hash);
+	}
+}
 
-	cluster_by_hash_wikispecies($hash);
+if (1)
+{
+	$filename = 'summary/hash.json';
+	$json = file_get_contents($filename);
+	
+	$obj = json_decode($json);
+	
+	foreach ($obj->rows as $row)
+	{
+		$hash = $row->key;
+		if ($row->value > 1)
+		{
+			print_r($row->key);
+			
+			cluster_by_hash_wikispecies($hash);
+		}
+		
+	
+	}
+	
 }
 
 

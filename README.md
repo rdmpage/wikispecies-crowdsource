@@ -73,6 +73,10 @@ DOI:10.1111/j.1440-6055.2008.00647.x
 Revision of the rove beetle genus Antimerus (Coleoptera, Staphylinidae, Staphylininae), a puzzling endemic Australian lineage of the tribe Staphylinini
 
 
+#### Too many copies
+
+Hash [1871, 43, 111] has 550 records, which means pairwise clustering will fail epically - need to think how to handle these cases…
+
 
 ## Heroku notes
 

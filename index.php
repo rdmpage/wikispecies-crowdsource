@@ -123,7 +123,11 @@ WHERE
 				    	
 				    		case 'researchgate':
 				    			html += '<li>' + '<i class="ai ai-researchgate"></i>'  + ' ' + '<a href="https://www.researchgate.net/profile/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
-				    			break;				    	
+				    			break;
+				    			
+				    		case 'viaf':
+				    			html += '<li>' + 'VF' + ' ' + '<a href="https://viaf.org/viaf/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
+				    			break;				    					    							    	
 				    	
 				    		case 'wikidata':
 				    			html += '<li>' + '<img src="images/wikidata.png" height="16" />' + ' ' + '<a href="https://www.wikidata.org/wiki/' + data.hits[0][j] + '" target="_new">' + data.hits[0][j] + '</a>' + '</li>';
@@ -347,11 +351,12 @@ WHERE
 							
 							var style = '';
 							if (clusters[i].length > 1) {
-								style += 'border-left:2px solid orange;background-color:#FFFFCC;';
+								style += 'border-left:2px solid orange;background-color:#FFFFCC;border-top:2px solid orange;background-color:#FFFFCC;';
 							}
+							html += '<div style="padding:10px;' + style + '">';
 							
 							for (var j in clusters[i]) {
-								html += '<div style="padding:10px;' + style + '">';
+								html += '<div>';
 								html += '<span style="font-size:1.5em;line-height:1em;"' 
 								
 									// this really should be record id not cluster id, but we don't have a way to
@@ -386,7 +391,7 @@ WHERE
 						
 								html += '</div>';
 							}
-							
+							html += '</div>';
 						
 						}
 						$('#content').html(html);
